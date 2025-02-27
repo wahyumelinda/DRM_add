@@ -1,9 +1,10 @@
 # DRM_add
 
+// Handle GET Requests
 function doGet(e) {
   try {
     var action = e.parameter.action;
-    var ss = SpreadsheetApp.openById("12GNa5BthMjzTI4n-c8Arc_eatCsG0QPwAlDhuq5dglk"); // Ganti dengan ID Spreadsheet yang sesuai
+    var ss = SpreadsheetApp.openById("YOUR_SPREADSHEET_ID"); // Replace with actual Spreadsheet ID
     var sheet = ss.getSheetByName("ALL");
 
     if (!sheet) {
@@ -25,11 +26,12 @@ function doGet(e) {
   }
 }
 
+// Handle POST Requests
 function doPost(e) {
   try {
     var params = JSON.parse(e.postData.contents);
     var action = params.action;
-    var ss = SpreadsheetApp.openById("12GNa5BthMjzTI4n-c8Arc_eatCsG0QPwAlDhuq5dglk");
+    var ss = SpreadsheetApp.openById("YOUR_SPREADSHEET_ID");
     var sheet = ss.getSheetByName("ALL");
 
     if (!sheet) {
@@ -49,39 +51,38 @@ function doPost(e) {
   }
 }
 
+// Retrieve Data
 function getData(sheet) {
   try {
-    var data = sheet.getDataRange().getDisplayValues(); // Ambil data sesuai tampilan di Sheets
+    var data = sheet.getDataRange().getDisplayValues();
     var formattedData = [];
 
-    if (data.length < 3) { // Minimal harus ada 3 baris (2 header + 1 data)
+    if (data.length < 3) {
       return ContentService.createTextOutput(JSON.stringify({ error: "Data tidak cukup" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    var timeZone = Session.getScriptTimeZone(); // Pastikan zona waktu sesuai dengan Apps Script
+    var timeZone = Session.getScriptTimeZone();
 
-    for (var i = 2; i < data.length; i++) { // Mulai dari baris ke-3 karena 2 baris pertama adalah header
+    for (var i = 2; i < data.length; i++) {
       var row = data[i].slice();
 
-      // Format Tanggal (misalnya ada di kolom ke-6)
-      if (row[5]) { // Pastikan tidak kosong
-        var dateValue = new Date(row[5]); // Konversi ke Date jika valid
+      if (row[5]) {
+        var dateValue = new Date(row[5]);
         if (!isNaN(dateValue.getTime())) {
           row[5] = Utilities.formatDate(dateValue, timeZone, "dd-MMM-yy");
         }
       }
 
-      // Format Waktu Mulai & Selesai (misalnya ada di kolom ke-7 dan ke-8)
       if (row[6]) {
-        var startTime = new Date("1970-01-01 " + row[6]); // Pastikan dalam format waktu
+        var startTime = new Date("1970-01-01 " + row[6]);
         if (!isNaN(startTime.getTime())) {
           row[6] = Utilities.formatDate(startTime, timeZone, "HH:mm");
         }
       }
 
       if (row[7]) {
-        var endTime = new Date("1970-01-01 " + row[7]); // Konversi waktu tanpa tanggal
+        var endTime = new Date("1970-01-01 " + row[7]);
         if (!isNaN(endTime.getTime())) {
           row[7] = Utilities.formatDate(endTime, timeZone, "HH:mm");
         }
@@ -97,7 +98,7 @@ function getData(sheet) {
   }
 }
 
-// Ambil opsi untuk select box dari sheet lain
+// Retrieve Select Box Options
 function getOptions(ss) {
   try {
     var sheets = ["BU", "Line", "Produk", "Mesin", "Masalah", "Tindakan Perbaikan", "Deskripsi", "Quantity", "PIC"];
@@ -118,7 +119,7 @@ function getOptions(ss) {
   }
 }
 
-// Konversi jam ke zona waktu Jakarta
+// Convert Time to Jakarta Timezone
 function convertToJakartaTime(timeString) {
   var timeParts = timeString.split(":");
   var date = new Date();
@@ -129,7 +130,7 @@ function convertToJakartaTime(timeString) {
   return Utilities.formatDate(date, "GMT+7", "HH:mm");
 }
 
-// Tambah data ke sheet "ALL"
+// Add Data to "ALL" Sheet
 function addData(sheet, params) {
   try {
     if (!params.Tanggal || !params.Mulai || !params.Selesai) {
@@ -138,12 +139,12 @@ function addData(sheet, params) {
     }
 
     var lastRow = sheet.getLastRow();
-    var newID = 1; // Default jika sheet kosong
+    var newID = 1;
 
-    if (lastRow > 1) { // Cek apakah ada data sebelumnya
-      var lastID = sheet.getRange(lastRow, 1).getValue(); // Ambil ID dari baris terakhir
+    if (lastRow > 1) {
+      var lastID = sheet.getRange(lastRow, 1).getValue();
       if (!isNaN(lastID) && lastID !== "") {
-        newID = lastID + 1; // Tambah 1 dari ID terakhir
+        newID = lastID + 1;
       }
     }
 
@@ -165,3 +166,4 @@ function addData(sheet, params) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
+
