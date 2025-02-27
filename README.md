@@ -1,6 +1,5 @@
 # DRM_add
 
-// Handle GET Requests
 function doGet(e) {
   try {
     var action = e.parameter.action;
@@ -26,7 +25,6 @@ function doGet(e) {
   }
 }
 
-// Handle POST Requests
 function doPost(e) {
   try {
     var params = JSON.parse(e.postData.contents);
@@ -51,7 +49,6 @@ function doPost(e) {
   }
 }
 
-// Retrieve Data
 function getData(sheet) {
   try {
     var data = sheet.getDataRange().getDisplayValues();
@@ -98,7 +95,6 @@ function getData(sheet) {
   }
 }
 
-// Retrieve Select Box Options
 function getOptions(ss) {
   try {
     var sheets = ["BU", "Line", "Produk", "Mesin", "Masalah", "Tindakan Perbaikan", "Deskripsi", "Quantity", "PIC"];
@@ -119,7 +115,6 @@ function getOptions(ss) {
   }
 }
 
-// Convert Time to Jakarta Timezone
 function convertToJakartaTime(timeString) {
   var timeParts = timeString.split(":");
   var date = new Date();
@@ -130,7 +125,6 @@ function convertToJakartaTime(timeString) {
   return Utilities.formatDate(date, "GMT+7", "HH:mm");
 }
 
-// Add Data to "ALL" Sheet
 function addData(sheet, params) {
   try {
     if (!params.Tanggal || !params.Mulai || !params.Selesai) {
